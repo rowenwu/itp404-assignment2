@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Templating</title>
+</head>
+<body>
+    
+    <button id='button'>Search</button>
+    <input id='input' value="subreddit name...">
+    <template id="post-list-template">
+        {{#each posts}}
+            <div class="post">
+                <h1>{{data.title}}</h1>
+                <p>Score: {{data.score}}</p>
+                {{#if data.num_comments}}
+                    <p>{{data.num_comments}} comments</p>
+                {{/if}}
+            </div>
+        {{/each}}
+    </template>
+
+    <div id='results'></div>
+          
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="handlebars-v4.0.10.js"></script>
+<script>
+
+const button = $('#button');
+
+
+    button.on('click', function(){
+        text = $('#input').val();
+        fetchPostsForSubreddit(text, function(results) {
+            var children = results.data.children;
+            var template = document.getElementById('post-list-template').innerHTML;
+            var renderPosts = Handlebars.compile(template);
+            document.getElementById('results').innerHTML = renderPosts({
+            posts: children
+            });
+        });
+    });
+
+
+    function fetchPostsForSubreddit(subreddit, func) {
+        $.getJSON('https://www.reddit.com/r/' + subreddit + '.json', func).then(function() {
+            // won't be called
+            }, function() {
+                $('#results').text("Oops! Something went wrong!");
+            });
+    }
+
+
+    
+</script>
+
+</body>
+</html>
